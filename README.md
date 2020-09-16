@@ -2,10 +2,19 @@
 
 A cute experiment to "learn" a compression language for proteins
 
-An example of a ML trained linear epitope :
+An example of a 2 ML trained linear epitopes :
 
 ![](logo-9.png)
 ![](logo-10.png)
+
+
+The core idea behind this architecture is super simple. A 1-D convolutional layer with a small number of filters is used to "learn" linear epitopes on every protein in the proteome. (From SwissProt). A global max pooling layer squeezes this output into a short binary vector, indicating whether or not that "virtual antibody" bound anywhere in that proteins sequence. The classification stage uses a softmax layer to "call" which protein is most likely.
+
+Amazingly, it converges quite well.
+
+![](model.png)
+
+
 
 
 Bash one-liner to find amino acid frequency accross SwissProt database
