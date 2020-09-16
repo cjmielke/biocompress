@@ -4,6 +4,7 @@ A cute experiment to "learn" a compression language for proteins
 
 An example of a ML trained linear epitope :
 
+![](logo-9.png)
 ![](logo-10.png)
 
 
