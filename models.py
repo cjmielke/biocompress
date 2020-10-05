@@ -10,10 +10,12 @@ from settings import MAX_PEPTIDE_LENGTH, ALPHABET, EPITOPE_LENGTH
 from keras import backend as K
 
 
-def binaryActivationFromTanh(x, threshold) :
+def binaryActivationFromTanh(x) :
+	threshold = 0.0
 	activated_x = K.tanh(x)
-	binary_activated_x = (activated_x > threshold)*1.0
-	# binary_activated_x = K.cast_to_floatx(binary_activated_x)
+	#binary_activated_x = (activated_x > threshold)#*1.0
+	binary_activated_x = K.round(activated_x)
+	#binary_activated_x = K.cast_to_floatx(binary_activated_x)
 	return binary_activated_x
 
 def buildModel(args, numProteins):
@@ -24,32 +26,23 @@ def buildModel(args, numProteins):
 	#x = Dropout(args.noise)(x)			# dropout on input might work ....
 
 	constraint = NonNeg()
-	constraint=None
+	#constraint=None
 	initializer = Zeros()
 	initializer='glorot_uniform'
-
+	from keras import regularizers
+	#reg=regularizers.l1(0.00001)
+	reg=None
 	x = Conv1D( args.antibodies, (EPITOPE_LENGTH),
-	            kernel_constraint=constraint, kernel_initializer=initializer,
+	            kernel_constraint=constraint, kernel_initializer=initializer, kernel_regularizer=reg,
 	            activation=None, padding='same')(x)
 
-	x = Activation('sigmoid', name='sigmoid')(x)
+	#x = Activation('sigmoid', name='sigmoid')(x)
+	x = Activation('tanh', name='tanh')(x)
 
-
+	#x = Activation(binaryActivationFromTanh)(x)
 
 	#if args.bn1: x = BatchNormalization()(x)
 
-	'''
-	convs = []
-	filter_sizes = [5]
-	#filter_sizes = [3,3]
-	for fsz in filter_sizes:
-		l_conv = Conv1D(args.antibodies, (fsz), activation='relu', padding='same')(x)
-		convs.append(l_conv)
-
-	x = Concatenate(axis=2)(convs)
-	x = MaxPooling1D(args.p1)(x)
-	if args.bn1: x = BatchNormalization()(x)
-	'''
 
 	# "flat" is my terrible lingo for different pooling types ....
 	# for antibodies binding to proteins, I think Max Pooling makes sense!
@@ -81,7 +74,7 @@ def buildModel(args, numProteins):
 
 
 	#x = BatchNormalization()(flat)
-	#x = Dropout(args.dropout)(x)        # HMMMM ..... what would the interpretation be?!
+	x = Dropout(args.dropout)(x)        # HMMMM ..... what would the interpretation be?!
 
 	'''
 	if args.fc2:
@@ -90,8 +83,7 @@ def buildModel(args, numProteins):
 	'''
 
 	protein = Dense(numProteins, activation='softmax', name='prediction')(x)
-	#rpkm = Dense(1, activation='linear', name='rpkm')(x)
-	#rpkm = Dense(1, activation='sigmoid', name='rpkm')(x)
+
 
 
 	model = Model(inputs=[sequence], outputs=[protein])

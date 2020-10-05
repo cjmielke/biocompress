@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
 	model = buildModel(args, numProteins)
 
-	#model.load_weights('good.h5', by_name=True)
+	#model.load_weights('model15_81p.h5', by_name=True)
 
 	'''
 	from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
